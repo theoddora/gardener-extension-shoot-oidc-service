@@ -46,6 +46,8 @@ vpa:
 
 gardener:
   version: ""
+  runtimeCluster:
+    enabled: true
 
 healthPort: 8081
 

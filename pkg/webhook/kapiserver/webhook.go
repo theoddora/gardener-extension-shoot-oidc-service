@@ -42,20 +42,37 @@ func New(mgr manager.Manager) (*extensionswebhook.Webhook, error) {
 		return nil, err
 	}
 
-	namespaceSelector := &metav1.LabelSelector{
-		MatchExpressions: []metav1.LabelSelectorRequirement{
-			{Key: v1beta1constants.LabelExtensionPrefix + "shoot-oidc-service", Operator: metav1.LabelSelectorOpIn, Values: []string{"true"}},
-		},
-	}
+	// TODO: Re-enable namespace selector once Gardner labels the garden namespace with the extensions enabled for the Garden resource.
+	// TOOD: discuss with team
+
+	// some options are to check the extension class, if garden -> search for label `role=garden`
+	// or custom label on the virtual api server
+
+	// problem: runtime garden is also a seed
+
+	// q: should we introduce a new label for the garden namespace to identify it as such?
+	// - label for the garden case
+	// - label for the seed case
+
+	// (task) we could add specific exetnsion label to the garden namespace - extension type and class
+	// this would be beneficial if we have both garden and seed
+
+	// goal - select the garden ns, i.e. label `name`
+
+	// namespaceSelector := &metav1.LabelSelector{
+	// 	MatchExpressions: []metav1.LabelSelectorRequirement{
+	// 		 {Key: v1beta1constants.LabelExtensionPrefix + "shoot-oidc-service", Operator: metav1.LabelSelectorOpIn, Values: []string{"true"}}, // Disable for Garden case
+	// 	},
+	// }
 
 	webhook := &extensionswebhook.Webhook{
-		Name:              "oidc",
-		Provider:          "",
-		Types:             types,
-		Target:            extensionswebhook.TargetSeed,
-		Path:              "oidc",
-		Webhook:           &admission.Webhook{Handler: handler},
-		NamespaceSelector: namespaceSelector,
+		Name:     "oidc",
+		Provider: "",
+		Types:    types,
+		Target:   extensionswebhook.TargetSeed,
+		Path:     "oidc",
+		Webhook:  &admission.Webhook{Handler: handler},
+		// NamespaceSelector: namespaceSelector,
 		ObjectSelector: &metav1.LabelSelector{
 			MatchLabels: map[string]string{
 				v1beta1constants.GardenRole: v1beta1constants.GardenRoleControlPlane,
